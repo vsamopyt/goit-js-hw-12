@@ -36,5 +36,9 @@ export default function setGallery(data, selector) {
     return acc;
   }, '');
 
-  document.querySelector(selector).innerHTML = gallery;
+  document.querySelector(selector).innerHTML += gallery;
+  
+ return  document.querySelector("img").getBoundingClientRect().height;
+ 
+
 }
