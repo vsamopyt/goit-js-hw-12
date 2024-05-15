@@ -58,6 +58,22 @@ function errorMessage(data) {
   });
 }
 
+function warningMessage(data) {
+  iziToast.error({
+    // title: 'Caution',
+    message: data,
+    position: 'topRight',
+    messageColor: 'white',
+    backgroundColor: "#4e75ff",
+    theme: 'dark',
+    color: 'red',
+    maxWidth: '432',
+    messageSize: '16',
+    titleSize: '16',
+    progressBar: false,
+  });
+}
+
 const lightbox = new SimpleLightbox('.gallery .gallery-item a', {
   captionSelector: 'img',
   captions: true,
@@ -82,6 +98,7 @@ formSearch.addEventListener('submit', event => {
   btnContinue.style.display = 'none';
   gallery.textContent = '';
   params.q = inputSearch.value;
+  params.page = 1;
 
   if (inputSearch.value.trim() === '' || inputSearch.value.trim() === ' ') {
     const messsage = 'please, fill the search request';
@@ -106,7 +123,16 @@ formSearch.addEventListener('submit', event => {
 
         lightbox.refresh();
 
-        if (users.hits.length > perPages || page < totalPages) {
+        // if (users.hits.length > perPages || page < totalPages) {
+        //   btnContinue.style.display = 'block';
+        // }
+
+        if (users.total <= perPages ) {
+          // btnContinue.style.display = 'block';
+          const messsage =
+            'We"re sorry, but you"ve reached the end of search results.';
+          warningMessage(messsage);
+        } else {
           btnContinue.style.display = 'block';
         }
       }
@@ -119,7 +145,7 @@ btnContinue.addEventListener('click', event => {
   if (page >= totalPages) {
     const messsage =
       'We"re sorry, but you"ve reached the end of search results.';
-    errorMessage(messsage);
+      warningMessage(messsage);
     btnContinue.style.display = 'none';
   } else {
     console.log(page);
