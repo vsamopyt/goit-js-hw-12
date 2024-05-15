@@ -1,12 +1,16 @@
 // IMPORT
+//JS
 import fetchPictures from './js/pixabay-api.js';
 import setGallery from './js/render-functions.js';
+
 // iziToast
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
+
 // SimpleLightbox
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+
 // axios
 import axios from 'axios';
 
@@ -18,8 +22,6 @@ const gallery = document.querySelector('.gallery');
 const loader = document.querySelector('.loader');
 const btnContinue = document.querySelector('.btn-continue');
 const galleryImg = document.querySelector('img');
-
-loader.style.display = 'none';
 
 // VARIABLE API
 const API_KEY = '15611929-f0ad527e9fe4615e5eed3c151';
@@ -41,10 +43,9 @@ const params = {
   page: page,
 };
 
-// FUNCTION
+// FUNCTIONS
 function errorMessage(data) {
   iziToast.error({
-    // title: 'Error:',
     message: data,
     position: 'topRight',
     messageColor: 'white',
@@ -56,15 +57,14 @@ function errorMessage(data) {
     titleSize: '16',
     progressBar: false,
   });
-}
+};
 
 function warningMessage(data) {
   iziToast.error({
-    // title: 'Caution',
     message: data,
     position: 'topRight',
     messageColor: 'white',
-    backgroundColor: "#4e75ff",
+    backgroundColor: '#4e75ff',
     theme: 'dark',
     color: 'red',
     maxWidth: '432',
@@ -72,7 +72,7 @@ function warningMessage(data) {
     titleSize: '16',
     progressBar: false,
   });
-}
+};
 
 const lightbox = new SimpleLightbox('.gallery .gallery-item a', {
   captionSelector: 'img',
@@ -91,8 +91,8 @@ const lightbox = new SimpleLightbox('.gallery .gallery-item a', {
 
 // CODE
 btnContinue.style.display = 'none';
-
 loader.style.display = 'none';
+
 formSearch.addEventListener('submit', event => {
   event.preventDefault();
   btnContinue.style.display = 'none';
@@ -116,19 +116,12 @@ formSearch.addEventListener('submit', event => {
       } else {
         totalHits = users.total;
         totalPages = Math.ceil(totalHits / perPages);
-
         loader.style.display = 'none';
         heightScroll = setGallery(users.hits, '.gallery');
         window.scrollBy(0, heightScroll);
-
         lightbox.refresh();
 
-        // if (users.hits.length > perPages || page < totalPages) {
-        //   btnContinue.style.display = 'block';
-        // }
-
-        if (users.total <= perPages ) {
-          // btnContinue.style.display = 'block';
+        if (users.total <= perPages) {
           const messsage =
             'We"re sorry, but you"ve reached the end of search results.';
           warningMessage(messsage);
@@ -136,33 +129,27 @@ formSearch.addEventListener('submit', event => {
           btnContinue.style.display = 'block';
         }
       }
-      page = 1;
+      page = 2;
     });
   }
 });
 
 btnContinue.addEventListener('click', event => {
-  if (page >= totalPages) {
+  params.page = page;
+  loader.style.display = 'block';
+
+  fetchPictures(urlApi, { params }).then(users => {
+    setGallery(users.hits, '.gallery');
+    window.scrollBy(0, heightScroll);
+
+    lightbox.refresh();
+    loader.style.display = 'none';
+  });
+  page += 1;
+  if (page > totalPages) {
     const messsage =
       'We"re sorry, but you"ve reached the end of search results.';
-      warningMessage(messsage);
+    warningMessage(messsage);
     btnContinue.style.display = 'none';
-  } else {
-    console.log(page);
-
-    page += 1;
-    params.page = page;
-    console.log(params.page);
-    loader.style.display = 'block';
-
-    fetchPictures(urlApi, { params }).then(users => {
-      setGallery(users.hits, '.gallery');
-      window.scrollBy(0, heightScroll);
-
-      lightbox.refresh();
-      loader.style.display = 'none';
-    });
   }
 });
-
-btnContinue.style.display = 'none';
